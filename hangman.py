@@ -1,5 +1,100 @@
+import random
+
 previous_guesses = []
 mistakes_list = []
+
+hangman_diagram = {0: "x-------x", 1: """
+    x-------x
+    |
+    |
+    |
+    |
+    |""", 2: """
+    x-------x
+    |       |
+    |       0
+    |
+    |
+    |""", 3: """
+    x-------x
+    |       |
+    |       0
+    |       |
+    |
+    |""", 4: """
+    x-------x
+    |       |
+    |       0
+    |      /|\\
+    |
+    |
+""", 5: """
+    x-------x
+    |       |
+    |       0
+    |      /|\\
+    |      /
+    |""", 6: """
+    x-------x
+    |       |
+    |       0
+    |      /|\\
+    |      / \\
+    |"""}
+
+
+def choose_word():
+    """
+    This function uses a file called "words".
+    The file contains English basic vocabulary which is used in both American and British dialects.
+    The function reads the file and copies its content to a list.
+    The function formats the list and then, chooses a random word from the list.
+    This word will be the secret word for the game.
+    :return: random_word
+    :rtype: str
+    """
+    file = open("words.txt", "r")
+    for _ in file:
+        content = file.read()
+        formatted_list = content.split("\n")
+    file.close()
+    random_word = random.choice(formatted_list)
+    return random_word
+
+
+def create_underscore(secret_word):
+    """
+    This function converts the secret word to a sequence of underscores.
+    :param secret_word: a word which the user needs to guess
+    :type secret_word: str
+    :return: a sequence of underscores
+    :rtype: str
+    """
+    beginning_string: str = ""
+    for _ in secret_word:
+        beginning_string = beginning_string + "_ "
+    return beginning_string
+
+
+def reveal_progress(secret_word, previous_guesses):
+    """
+    This function reveals the progress of the game.
+    This function returns a string contains letters and underscores.
+    The letters are the right guesses from previous_guesses, in their position in the secret word.
+    A letter which the user has not guessed yet, is replaced with an underscore.
+    :param previous_guesses: a list of the previous guesses of the user.
+    :param secret_word: the word the user needs to guess
+    type secret_word: string
+    :return: user_interface
+    :rtype: str
+    """
+    user_interface = ""
+    for letter in secret_word:
+        if letter in previous_guesses:
+            user_interface = user_interface + letter
+        else:
+            user_interface = user_interface + "_ "
+    return user_interface
 
 
 def format_guesses_user_order(previous_guesses):
@@ -43,7 +138,6 @@ def present_guesses(previous_guesses, lower_cased_guessed):
     :type lower_cased_guessed: str
     :param previous_guesses: previous guesses of the user
     :type previous_guesses: str
-    :return: None
     """
     if len(previous_guesses) > 2:
         print("Here is a list of the letters you have guessed by guessing order: ")
@@ -60,7 +154,6 @@ def present_guesses(previous_guesses, lower_cased_guessed):
         print(alphabetical_two_letters[0], "and", alphabetical_two_letters[1])
     else:
         print("You have only guessed one letter:", lower_cased_guessed)
-    return None
 
 
 def input_validation(lower_cased_guessed):
@@ -90,69 +183,6 @@ def input_validation(lower_cased_guessed):
     return valid
 
 
-def reveal_progress(secret_word, previous_guesses):
-    """
-    This function reveals the progress of the game.
-    This function returns a string contains letters and underscores.
-    The letters are the right guesses from previous_guesses, in their position in the secret word.
-    A letter which the user has not guessed yet, is replaced with an underscore.
-    :param previous_guesses: a list of the previous guesses of the user.
-    :param secret_word: the word the user needs to guess
-    type secret_word: string
-    :return: user_interface
-    :rtype: str
-    """
-    user_interface = ""
-    for letter in secret_word:
-        if letter in previous_guesses:
-            user_interface = user_interface + letter
-        else:
-            letter_replaced = "_ "
-            user_interface = user_interface + letter_replaced
-    return user_interface
-
-
-# This dictionary contains the diagram of an hanged man.
-HANGMAN_DIAGRAM = {0: "x-------x", 1: """
-    x-------x
-    |
-    |
-    |
-    |
-    |""", 2: """
-    x-------x
-    |       |
-    |       0
-    |
-    |
-    |""", 3: """
-    x-------x
-    |       |
-    |       0
-    |       |
-    |
-    |""", 4: """
-    x-------x
-    |       |
-    |       0
-    |      /|\\
-    |
-    |
-""", 5: """
-    x-------x
-    |       |
-    |       0
-    |      /|\\
-    |      /
-    |""", 6: """
-    x-------x
-    |       |
-    |       0
-    |      /|\\
-    |      / \\
-    |"""}
-
-
 def counting_mistakes(secret_word, lower_cased_guessed):
     """
     This function checks if the letter suggested by the user is in the secret word,
@@ -174,7 +204,7 @@ def counting_mistakes(secret_word, lower_cased_guessed):
         print("Correct guess!")
     mistakes_num = len(mistakes_list)
     print("Number of mistakes: ", mistakes_num)
-    current_diagram = HANGMAN_DIAGRAM[mistakes_num]
+    current_diagram = hangman_diagram[mistakes_num]
     print(current_diagram)
     if mistakes_num == 6:
         print("Game over! You lost!")
@@ -202,23 +232,8 @@ def check_winning(secret_word, previous_guesses):
 
 
 def game_loop():
-    """
-    This function creates a loop to create multiple turns for the same game.
-    First, a secret word is chosen and presented on the screen.
-    Afterwards, in each turn, the user suggests a letter.
-    If the user's input is not valid,
-    the program prints an error and urges the user to suggest a different input.
-    Then, a string contains letters and underscores is presented on the screen.
-    As the loop runs, the user suggests more letters and sees the letters he/she already guessed.
-    The loop breaks when the user wins or loses.
-    The user wins when he/she finds all the letters of the secret word.
-    The user loses the game in the sixth mistake.
-    """
     mistakes_num = 0
-    winning = False
-    secret_word = choose_word()
-    print(create_underscore(secret_word))
-    while winning == False and mistakes_num < 6:
+    while mistakes_num < 6:
         letter_guessed: str = input("Please suggest a letter: ")
         lower_cased_guessed = letter_guessed.lower()
         validation_result = input_validation(lower_cased_guessed)
@@ -226,48 +241,14 @@ def game_loop():
             continue
         progress = reveal_progress(secret_word, previous_guesses)
         print(progress)
-        winning = check_winning(secret_word, previous_guesses)
-        if winning:
-            break
+        present_guesses(previous_guesses, lower_cased_guessed)
         mistakes_num = counting_mistakes(secret_word, lower_cased_guessed)
         if mistakes_num == 6:
             break
-        present_guesses(previous_guesses, lower_cased_guessed)
-    return None
-
-
-def create_underscore(secret_word):
-    """
-    This function converts the secret word to a sequence of underscores.
-    :param secret_word: a word which the user needs to guess
-    :type secret_word: str
-    :return: a sequence of underscores
-    :rtype: str
-    """
-    beginning_string: str = ""
-    for _ in secret_word:
-        beginning_string = beginning_string + "_"
-    return beginning_string
-
-
-def choose_word():
-    """
-    This function uses a file called "words".
-    The file contains English basic vocabulary which is used in both American and British dialects.
-    The function reads the file and copies its content to a list.
-    The function formats the list and then, chooses a random word from the list.
-    This word will be the secret word for the game.
-    :return: random_word
-    :rtype: str
-    """
-    import random
-    file = open("words.txt", "r")
-    for _ in file:
-        content = file.read()
-        formatted_list = content.split("\n")
-    file.close()
-    random_word = random.choice(formatted_list)
-    return random_word
+        winning = check_winning(secret_word, previous_guesses)
+        if winning == True:
+            mistakes_num == 10
+            break
 
 
 print("""Welcome to hangman!
@@ -281,4 +262,6 @@ A diagram of an hanged person will gradually appear, based on the number of your
 In the sixth mistake, you will lose the game and the poor man will be hanged!
 Let's Begin!
 Here is your secret word: """)
+secret_word = choose_word()
+print(create_underscore(secret_word))
 game_loop()

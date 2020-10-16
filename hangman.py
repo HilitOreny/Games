@@ -53,6 +53,7 @@ def choose_word():
     :return: random_word
     :rtype: str
     """
+    global formatted_list
     file = open("words.txt", "r")
     for _ in file:
         content = file.read()
@@ -100,34 +101,25 @@ def reveal_progress(secret_word, previous_guesses):
 def format_guesses_user_order(previous_guesses):
     """This function sorts previous_guesses list by user's order.
     :param previous_guesses: previous guesses of the user
-    :type previous_guesses: str
+    :type previous_guesses: list
     :return: sequence of letters
-    :rtype: list
+    :rtype: str
     """
-    create_list1 = previous_guesses[0:-1]
-    last_item1 = previous_guesses[-1]
-    last_item_and1 = "and " + str(last_item1)
-    last_item_list1 = [last_item_and1]
-    new_list1 = create_list1 + last_item_list1
-    sequence1 = ", ".join(new_list1)
-    return sequence1
-
+    converted = ', '.join(map(str, previous_guesses[0:-1]))
+    final = converted + " and " + str(previous_guesses[-1])
+    return final
 
 def format_guesses_alphabetical_order(previous_guesses):
     """This function sorts previous_guesses list by alphabetical order.
     :param previous_guesses: previous guesses of the user
-    :type previous_guesses: str
+    :type previous_guesses: list
     :return: sequence of letters
-    :rtype: list
+    :rtype: str
     """
     alphabetical_order = sorted(previous_guesses)
-    create_list2 = alphabetical_order[0:-1]
-    last_item2 = alphabetical_order[-1]
-    last_item_and2 = "and " + str(last_item2)
-    last_item_list2 = [last_item_and2]
-    new_list2 = create_list2 + last_item_list2
-    sequence2 = ", ".join(new_list2)
-    return sequence2
+    alphabetical_converted = ', '.join(map(str, alphabetical_order[0:-1]))
+    alphabetical_final = alphabetical_converted + " and " + str(alphabetical_order[-1])
+    return alphabetical_final
 
 
 def present_guesses(previous_guesses, lower_cased_guessed):
@@ -246,8 +238,7 @@ def game_loop():
         if mistakes_num == 6:
             break
         winning = check_winning(secret_word, previous_guesses)
-        if winning == True:
-            mistakes_num == 10
+        if winning:
             break
 
 

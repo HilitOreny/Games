@@ -53,13 +53,11 @@ def choose_word():
     :return: random_word
     :rtype: str
     """
-    global formatted_list
     file = open("words.txt", "r")
-    for _ in file:
-        content = file.read()
-        formatted_list = content.split("\n")
+    word_list = file.readlines()
     file.close()
-    random_word = random.choice(formatted_list)
+    new_list = [item.removesuffix("\n") for item in word_list]
+    random_word = random.choice(new_list)
     return random_word
 
 

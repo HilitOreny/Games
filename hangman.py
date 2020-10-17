@@ -106,6 +106,13 @@ class MultipleCharacters(Exception):
 
 
 def one_character_validation(character):
+    """
+    this function validates that the user's input is only 1 character.
+    :param character: a lower-cased string of user's input
+    :type character: str
+    :return: a statement whether the input is only 1 character.
+    :rtype: bool
+    """
     try:
         if len(character) != 1:
             raise MultipleCharacters
@@ -119,6 +126,15 @@ class Repeat(Exception):
 
 
 def non_repeat_validation(current_letter, validation_list):
+    """
+    this function validates that the user's input is only 1 character.
+    :param current_letter: a lower-cased string of user's input
+    :type current_letter: str
+    :param validation_list: a list of letters which were already guessed
+    :type validation_list: list
+    :return: a statement whether the input is only 1 character.
+    :rtype: bool
+    """
     try:
         if current_letter in validation_list:
             raise Repeat
@@ -133,6 +149,13 @@ class NoAlpha(Exception):
 
 
 def alpha_validation(user_input):
+    """
+    this function validates that the user's input contains only letters.
+    :param user_input: a lower-cased string of user's input
+    :type user_input: str
+    :return: does the user's input contain only letters?
+    :rtype: bool
+    """
     try:
         if not user_input.isalpha():
             raise NoAlpha
@@ -143,11 +166,23 @@ def alpha_validation(user_input):
 
 
 def check_letter_in_word(word3, character2):
+    """
+    :param word3: the secret word
+    :type word3: str
+    :param character2: the character which the user entered
+    :type character2: str
+    :return: is the character in the word?
+    :rtype: bool
+    """
     check_in = character2 in word3
     return check_in
 
 
 def present_message(true_guess):
+    """
+    :param true_guess: is the guess correct?
+    :type true_guess: bool
+    """
     if true_guess:
         print("Correct guess!")
     else:
@@ -155,18 +190,40 @@ def present_message(true_guess):
 
 
 def create_mistakes_list(true_guess, character3, user_mistakes_list):
+    """
+    :param true_guess: is the guess correct?
+    :type true_guess: bool
+    :param character3: the character which the user entered
+    :type character3: str
+    :type user_mistakes_list: list
+    :return: an updated version of the user_mistakes_list
+    :rtype: list
+    """
     if not true_guess:
         user_mistakes_list.append(character3)
     return user_mistakes_list
 
 
 def counting_mistakes(my_list):
+    """
+    :param my_list: a list of mistakes
+    :type my_list: list
+    :return: the number of mistakes
+    :rtype: int
+    """
     my_list_num = len(my_list)
     print("Number of mistakes: ", my_list_num)
     return my_list_num
 
 
 def diagram(number):
+    """
+    this function returns the relevant diagram
+    based on the number of mistakes.
+    :param number: number of mistakes
+    :type number: int
+    :rtype: str
+    """
     hangman_diagram = {0: "x-------x", 1: """
          x-------x
          |
@@ -210,12 +267,27 @@ def diagram(number):
 
 
 def find_winning_number(letter_in_word, winning_number):
+    """
+    :param letter_in_word: is the letter in the secret word?
+    :type letter_in_word: bool
+    :param winning_number: the number of correct guesses
+    :return: a number of the correct guesses of the user
+    :rtype: int
+    """
     if letter_in_word:
         winning_number = winning_number + 1
     return winning_number
 
 
 def check_winning(word4, winning_num):
+    """
+    :param word4: the secret word
+    :type word4: str
+    :param winning_num: the correct guesses of the user
+    :type winning_num: int
+    :return: has the user guessed all the letters?
+    :rtype: bool
+    """
     you_won = len(word4) == winning_num
     if you_won:
         print("Congratulations, you won!")
@@ -223,7 +295,10 @@ def check_winning(word4, winning_num):
 
 
 def game_loop(secret_word):
-    previous_guesses = []
+    """
+    the loop creates multiple turns.
+    """
+    previous_guesses_list = []
     mistakes_list = []
     correct_guesses_num = 0
     mistakes_num = 0
@@ -231,14 +306,14 @@ def game_loop(secret_word):
         letter_guessed: str = input("Please suggest a letter: ")
         lower_cased_guessed = letter_guessed.lower()
         valid1 = one_character_validation(lower_cased_guessed)
-        valid2 = non_repeat_validation(lower_cased_guessed, previous_guesses)
+        valid2 = non_repeat_validation(lower_cased_guessed, previous_guesses_list)
         valid3 = alpha_validation(lower_cased_guessed)
         valid = valid1 and valid2 and valid3
         if not valid:
             continue
-        progress = reveal_progress(secret_word, previous_guesses)
+        progress = reveal_progress(secret_word, previous_guesses_list)
         print(progress)
-        present_guesses(previous_guesses, lower_cased_guessed)
+        present_guesses(previous_guesses_list, lower_cased_guessed)
         is_correct = check_letter_in_word(secret_word, lower_cased_guessed)
         present_message(is_correct)
         your_mistakes_list = create_mistakes_list(is_correct, lower_cased_guessed, mistakes_list)
@@ -249,8 +324,7 @@ def game_loop(secret_word):
             print("Your secret word was:", secret_word)
             break
         find_winning_number(is_correct, correct_guesses_num)
-        check_winning(secret_word, correct_guesses_num)
-        winning = check_winning(secret_word, previous_guesses)
+        winning = check_winning(secret_word, correct_guesses_num)
         if winning:
             break
 

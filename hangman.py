@@ -1,7 +1,5 @@
 import random
 
-previous_guesses = []
-
 
 def create_word_list():
     file = open("words.txt", "r")
@@ -23,53 +21,53 @@ def create_underscore(word1):
     return beginning_string
 
 
-def reveal_progress(word2, previous_guesses):
+def reveal_progress(word2, list1):
     user_interface = ""
     for letter in word2:
-        if letter in previous_guesses:
+        if letter in list1:
             user_interface = user_interface + letter
         else:
             user_interface = user_interface + "_ "
     return user_interface
 
 
-def format_guesses_user_order(previous_guesses):
-    converted = ', '.join(map(str, previous_guesses[0:-1]))
-    final = converted + " and " + str(previous_guesses[-1])
+def format_guesses_user_order(list2):
+    converted = ', '.join(map(str, list2[0:-1]))
+    final = converted + " and " + str(list2[-1])
     return final
 
 
-def format_guesses_alphabetical_order(previous_guesses):
-    alphabetical_order = sorted(previous_guesses)
+def format_guesses_alphabetical_order(list3):
+    alphabetical_order = sorted(list3)
     alphabetical_converted = ', '.join(map(str, alphabetical_order[0:-1]))
     alphabetical_final = alphabetical_converted + " and " + str(alphabetical_order[-1])
     return alphabetical_final
 
 
-def present_guesses(previous_guesses, one_letter):
-    if len(previous_guesses) > 2:
+def present_guesses(user_guesses_list, one_letter):
+    if len(user_guesses_list) > 2:
         print("Here is a list of the letters you have guessed by guessing order: ")
-        current_list = format_guesses_user_order(previous_guesses)
+        current_list = format_guesses_user_order(user_guesses_list)
         print(current_list)
         print("Here is a list of the letters you have guessed by alphabetical order: ")
-        alphabetical_list = format_guesses_alphabetical_order(previous_guesses)
+        alphabetical_list = format_guesses_alphabetical_order(user_guesses_list)
         print(alphabetical_list)
-    elif len(previous_guesses) == 2:
+    elif len(user_guesses_list) == 2:
         print("Here is a list of the letters you have guessed by guessing order: ")
-        print(previous_guesses[0], "and", previous_guesses[1])
+        print(user_guesses_list[0], "and", user_guesses_list[1])
         print("Here is a list of the letters you have guessed by alphabetical order: ")
-        alphabetical_two_letters = sorted(previous_guesses)
+        alphabetical_two_letters = sorted(user_guesses_list)
         print(alphabetical_two_letters[0], "and", alphabetical_two_letters[1])
     else:
         print("You have only guessed one letter:", one_letter)
 
 
-def input_validation(character):
-    compare = character not in previous_guesses
+def input_validation(character, attempts_list):
+    compare = character not in attempts_list
     only_english = character in "abcdefghijklmnopqrstuvwxyz"
     valid = only_english and len(character) == 1 and compare
     if valid:
-        previous_guesses.append(character)
+        attempts_list.append(character)
     if len(character) > 1:
         print("Please suggest just one letter...")
     if not only_english:
@@ -77,7 +75,7 @@ def input_validation(character):
               No numbers, symbols or any other letters, please...""")
     if not compare:
         print("You have already guessed this letter...Please suggest a different letter.")
-        present_guesses(previous_guesses, character)
+        present_guesses(attempts_list, character)
     return valid
 
 
@@ -86,8 +84,8 @@ def check_letter(word3, character2):
     return check_in
 
 
-def checking_message(true):
-    if true:
+def present_message(true_guess):
+    if true_guess:
         print("Correct guess!")
     else:
         print("Wrong guess! A poor man will be soon hanged!")
@@ -148,38 +146,44 @@ def diagram(number):
     return current_diagram
 
 
-def check_winning(word4, previous_guesses):
-    checking_list = []
-    for letter in word4:
-        check_this_letter = str(letter in previous_guesses)
-        checking_list.append(check_this_letter)
-    you_won = "False" not in checking_list
+def find_winning_number(letter_in_word, winning_number):
+    if letter_in_word:
+        winning_number = winning_number + 1
+    return winning_number
+
+
+def check_winning(word4, winning_num):
+    you_won = len(word4) == winning_num
     if you_won:
         print("Congratulations, you won!")
     return you_won
 
 
-def game_loop():
+def game_loop(secret_word):
+    previous_guesses = []
     mistakes_list = []
+    correct_guesses_num = 0
     mistakes_num = 0
     while mistakes_num < 6:
         letter_guessed: str = input("Please suggest a letter: ")
         lower_cased_guessed = letter_guessed.lower()
-        validation_result = input_validation(lower_cased_guessed)
+        validation_result = input_validation(lower_cased_guessed, previous_guesses)
         if not validation_result:
             continue
         progress = reveal_progress(secret_word, previous_guesses)
         print(progress)
         present_guesses(previous_guesses, lower_cased_guessed)
-        correct_guess = check_letter(secret_word, lower_cased_guessed)
-        checking_message(correct_guess)
-        your_mistakes_list = create_mistakes_list(correct_guess, lower_cased_guessed, mistakes_list)
+        is_correct = check_letter(secret_word, lower_cased_guessed)
+        present_message(is_correct)
+        your_mistakes_list = create_mistakes_list(is_correct, lower_cased_guessed, mistakes_list)
         mistakes_num = counting_mistakes(your_mistakes_list)
         print(diagram(mistakes_num))
         if mistakes_num == 6:
             print("Game over! You lost!")
             print("Your secret word was:", secret_word)
             break
+        find_winning_number(is_correct, correct_guesses_num)
+        check_winning(secret_word, correct_guesses_num)
         winning = check_winning(secret_word, previous_guesses)
         if winning:
             break
@@ -197,6 +201,6 @@ In the sixth mistake, you will lose the game and the poor man will be hanged!
 Let's Begin!
 Here is your secret word: """)
 new_list = create_word_list()
-secret_word = choose_word(new_list)
-print(create_underscore(secret_word))
-game_loop()
+chosen_word = choose_word(new_list)
+print(create_underscore(chosen_word))
+game_loop(chosen_word)

@@ -1,7 +1,6 @@
 import random
 
 previous_guesses = []
-mistakes_list = []
 
 
 def create_word_list():
@@ -83,57 +82,58 @@ def input_validation(lower_cased_guessed):
 
 
 def counting_mistakes(secret_word, lower_cased_guessed):
-    hangman_diagram = {0: "x-------x", 1: """
-        x-------x
-        |
-        |
-        |
-        |
-        |""", 2: """
-        x-------x
-        |       |
-        |       0
-        |
-        |
-        |""", 3: """
-        x-------x
-        |       |
-        |       0
-        |       |
-        |
-        |""", 4: """
-        x-------x
-        |       |
-        |       0
-        |      /|\\
-        |
-        |
-    """, 5: """
-        x-------x
-        |       |
-        |       0
-        |      /|\\
-        |      /
-        |""", 6: """
-        x-------x
-        |       |
-        |       0
-        |      /|\\
-        |      / \\
-        |"""}
+    mistakes_list = []
     if lower_cased_guessed not in secret_word:
         mistakes_list.append("mistake")
         print("Wrong guess! A poor man will be soon hanged!")
     else:
         print("Correct guess!")
-    mistakes_num = len(mistakes_list)
-    print("Number of mistakes: ", mistakes_num)
-    current_diagram = hangman_diagram[mistakes_num]
-    print(current_diagram)
-    if mistakes_num == 6:
-        print("Game over! You lost!")
-        print("Your secret word was:", secret_word)
-    return mistakes_num
+    mistakes_list_num = len(mistakes_list)
+    print("Number of mistakes: ", mistakes_list_num)
+    return mistakes_list_num
+
+
+def diagram(number):
+    hangman_diagram = {0: "x-------x", 1: """
+         x-------x
+         |
+         |
+         |
+         |
+         |""", 2: """
+         x-------x
+         |       |
+         |       0
+         |
+         |
+         |""", 3: """
+         x-------x
+         |       |
+         |       0
+         |       |
+         |
+         |""", 4: """
+         x-------x
+         |       |
+         |       0
+         |      /|\\
+         |
+         |
+     """, 5: """
+         x-------x
+         |       |
+         |       0
+         |      /|\\
+         |      /
+         |""", 6: """
+         x-------x
+         |       |
+         |       0
+         |      /|\\
+         |      / \\
+         |"""}
+    current_diagram = hangman_diagram[number]
+    return current_diagram
 
 
 def check_winning(secret_word, previous_guesses):
@@ -159,7 +159,10 @@ def game_loop():
         print(progress)
         present_guesses(previous_guesses, lower_cased_guessed)
         mistakes_num = counting_mistakes(secret_word, lower_cased_guessed)
+        diagram(mistakes_num)
         if mistakes_num == 6:
+            print("Game over! You lost!")
+            print("Your secret word was:", secret_word)
             break
         winning = check_winning(secret_word, previous_guesses)
         if winning:

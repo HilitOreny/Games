@@ -1,7 +1,13 @@
+"""using random module, a secret word will be randomly chosen"""
 import random
 
 
 def create_word_list():
+    """
+    This function opens a file called "words.txt".
+    The function reads the file, copies its content to a list
+    and formats it.
+    """
     file = open("words.txt", "r")
     content = file.readlines()
     file.close()
@@ -9,12 +15,26 @@ def create_word_list():
     return word_list
 
 
-def choose_word(words_from_file_list: list):
-    random_word = random.choice(words_from_file_list)
+def choose_word(words_list: list):
+    """
+    This function chooses a random word from the list.
+    This word will be later used by other functions as the secret word for the game.
+    param words_list type: list
+    :return: random_word
+    :rtype: str
+    """
+    random_word = random.choice(words_list)
     return random_word
 
 
 def create_underscore(word1):
+    """
+    This function converts the secret word to a sequence of underscores.
+    :param word1: a word which the user needs to guess
+    :type word1: str
+    :return: a sequence of underscores
+    :rtype: str
+    """
     beginning_string: str = ""
     for _ in word1:
         beginning_string = beginning_string + "_ "
@@ -22,6 +42,17 @@ def create_underscore(word1):
 
 
 def reveal_progress(word2, list1):
+    """
+    This function reveals the progress of the game.
+    This function returns a string of letters and underscores.
+    The letters are the right guesses, in their position in the secret word.
+    A letter which the user has not guessed yet, is replaced with an underscore.
+    :param list1: a list of the previous guesses of the user.
+    :param word2: the word the user needs to guess
+    type word2: str
+    :return: user_interface
+    :rtype: str
+    """
     user_interface = ""
     for letter in word2:
         if letter in list1:
@@ -31,26 +62,34 @@ def reveal_progress(word2, list1):
     return user_interface
 
 
-def format_guesses_user_order(list2):
+def format_guesses(list2):
+    """This function converts a list of letters to a string.
+    :param list2: previous guesses of the user
+    :type list2: list
+    :return: sequence of letters
+    :rtype: str
+    """
     converted = ', '.join(map(str, list2[0:-1]))
     final = converted + " and " + str(list2[-1])
     return final
 
 
-def format_guesses_alphabetical_order(list3):
-    alphabetical_order = sorted(list3)
-    alphabetical_converted = ', '.join(map(str, alphabetical_order[0:-1]))
-    alphabetical_final = alphabetical_converted + " and " + str(alphabetical_order[-1])
-    return alphabetical_final
-
-
 def present_guesses(user_guesses_list, one_letter):
+    """This function presents the list of previous guesses in two formats.
+    The first format is guessing order.
+    The second format is alphabetical order.
+    :param one_letter: a lower-cased string of user's input
+    :type one_letter: str
+    :param user_guesses_list: previous guesses of the user
+    :type user_guesses_list: list
+    """
     if len(user_guesses_list) > 2:
         print("Here is a list of the letters you have guessed by guessing order: ")
-        current_list = format_guesses_user_order(user_guesses_list)
+        current_list = format_guesses(user_guesses_list)
         print(current_list)
         print("Here is a list of the letters you have guessed by alphabetical order: ")
-        alphabetical_list = format_guesses_alphabetical_order(user_guesses_list)
+        alphabetical_order = sorted(current_list)
+        alphabetical_list = format_guesses(alphabetical_order)
         print(alphabetical_list)
     elif len(user_guesses_list) == 2:
         print("Here is a list of the letters you have guessed by guessing order: ")
@@ -62,24 +101,48 @@ def present_guesses(user_guesses_list, one_letter):
         print("You have only guessed one letter:", one_letter)
 
 
-def input_validation(character, attempts_list):
-    compare = character not in attempts_list
-    only_english = character in "abcdefghijklmnopqrstuvwxyz"
-    valid = only_english and len(character) == 1 and compare
-    if valid:
-        attempts_list.append(character)
-    if len(character) > 1:
+class MultipleCharacters(Exception):
+    """This class is later used for user's input validation"""
+
+
+def one_character_validation(character):
+    try:
+        if len(character) != 1:
+            raise MultipleCharacters
+    except MultipleCharacters:
         print("Please suggest just one letter...")
-    if not only_english:
-        print("""Please suggest a letter of English alphabet.
-              No numbers, symbols or any other letters, please...""")
-    if not compare:
-        print("You have already guessed this letter...Please suggest a different letter.")
-        present_guesses(attempts_list, character)
-    return valid
+    return len(character) == 1
 
 
-def check_letter(word3, character2):
+class Repeat(Exception):
+    """This class is later used for user's input validation"""
+
+
+def non_repeat_validation(current_letter, validation_list):
+    try:
+        if current_letter in validation_list:
+            raise Repeat
+    except Repeat:
+        print("""You have already guessed this letter...
+    Please suggest a different letter.""")
+    return current_letter in validation_list
+
+
+class NoAlpha(Exception):
+    """This class is later used for user's input validation"""
+
+
+def alpha_validation(user_input):
+    try:
+        if not user_input.isalpha():
+            raise NoAlpha
+    except NoAlpha:
+        print("""Please suggest a letter.
+              No numbers or symbols, please...""")
+    return user_input.isalpha()
+
+
+def check_letter_in_word(word3, character2):
     check_in = character2 in word3
     return check_in
 
@@ -167,13 +230,16 @@ def game_loop(secret_word):
     while mistakes_num < 6:
         letter_guessed: str = input("Please suggest a letter: ")
         lower_cased_guessed = letter_guessed.lower()
-        validation_result = input_validation(lower_cased_guessed, previous_guesses)
-        if not validation_result:
+        valid1 = one_character_validation(lower_cased_guessed)
+        valid2 = non_repeat_validation(lower_cased_guessed, previous_guesses)
+        valid3 = alpha_validation(lower_cased_guessed)
+        valid = valid1 and valid2 and valid3
+        if not valid:
             continue
         progress = reveal_progress(secret_word, previous_guesses)
         print(progress)
         present_guesses(previous_guesses, lower_cased_guessed)
-        is_correct = check_letter(secret_word, lower_cased_guessed)
+        is_correct = check_letter_in_word(secret_word, lower_cased_guessed)
         present_message(is_correct)
         your_mistakes_list = create_mistakes_list(is_correct, lower_cased_guessed, mistakes_list)
         mistakes_num = counting_mistakes(your_mistakes_list)

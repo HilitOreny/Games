@@ -8,9 +8,8 @@ def create_word_list():
     The function reads the file, copies its content to a list
     and formats it.
     """
-    file = open("words.txt", "r")
-    content = file.readlines()
-    file.close()
+    with open("words.txt", "r") as file:
+        content = file.readlines()
     word_list = [item.removesuffix("\n") for item in content]
     return word_list
 

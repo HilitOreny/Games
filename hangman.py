@@ -294,9 +294,12 @@ def check_winning(word4, winning_num):
 
 
 def game_loop(secret_word):
-    """
-    the loop creates multiple turns.
-    """
+    """a loop creates multiple turns for the same game.
+    First, a secret word is chosen and presented on the screen.
+    Afterwards, in each turn, the user suggests a letter.
+    The input is checked to make sure it is valid.
+    Then, the user's progress and previous letters are presented.
+    The loop breaks when the user wins or loses."""
     previous_guesses_list = []
     mistakes_list = []
     correct_guesses_num = 0

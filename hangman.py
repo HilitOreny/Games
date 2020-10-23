@@ -1,6 +1,14 @@
-"""using random module, a secret word will be randomly chosen"""
-import random
-
+print("""Welcome to hangman!
+In this game, your goal is to guess the secret word before an innocent man is hanged.
+The secret word will be shown as a sequence of underscores (_). Each underscore represents a letter.
+For example, _ _ _ is a three-letter word.
+Each turn, you will suggest a letter.
+If the letter occurs in the secret word, the letter will appear in the word in its position.
+If the suggested letter does not occur in the word, your mistake is fatal!
+A diagram of an hanged person will gradually appear, based on the number of your wrong guesses.
+In the sixth mistake, you will lose the game and the poor man will be hanged!
+Let's Begin!
+Here is your secret word: """)
 
 def create_word_list():
     """
@@ -13,8 +21,12 @@ def create_word_list():
     word_list = [item.removesuffix("\n") for item in content]
     return word_list
 
+new_list = create_word_list()
 
-def choose_word(words_list: list):
+"""using random module, a secret word will be randomly chosen"""
+import random
+
+def choose_word(new_list):
     """
     This function chooses a random word from the list.
     This word will be later used by other functions as the secret word for the game.
@@ -22,22 +34,26 @@ def choose_word(words_list: list):
     :return: random_word
     :rtype: str
     """
-    random_word = random.choice(words_list)
+    random_word = random.choice(new_list)
     return random_word
 
+chosen_word = choose_word(new_list)
 
-def create_underscore(word1):
+def create_underscore(chosen_word):
     """
     This function converts the secret word to a sequence of underscores.
-    :param word1: a word which the user needs to guess
-    :type word1: str
+    :param chosen_word: a word which the user needs to guess
+    :type chosen_word: str
     :return: a sequence of underscores
     :rtype: str
     """
     beginning_string: str = ""
-    for _ in word1:
+    for _ in chosen_word:
         beginning_string = beginning_string + "_ "
     return beginning_string
+
+
+print(create_underscore(chosen_word))
 
 
 def reveal_progress(word2, list1):
@@ -310,8 +326,7 @@ def game_loop(secret_word):
         valid1 = one_character_validation(lower_cased_guessed)
         valid2 = non_repeat_validation(lower_cased_guessed, previous_guesses_list)
         valid3 = alpha_validation(lower_cased_guessed)
-        valid = valid1 and valid2 and valid3
-        if not valid:
+        if not valid1 or not valid2 or not valid3:
             continue
         progress = reveal_progress(secret_word, previous_guesses_list)
         print(progress)
@@ -330,19 +345,4 @@ def game_loop(secret_word):
         if winning:
             break
 
-
-print("""Welcome to hangman!
-In this game, your goal is to guess the secret word before an innocent man is hanged.
-The secret word will be shown as a sequence of underscores (_). Each underscore represents a letter.
-For example, _ _ _ is a three-letter word.
-Each turn, you will suggest a letter.
-If the letter occurs in the secret word, the letter will appear in the word in its position.
-If the suggested letter does not occur in the word, your mistake is fatal!
-A diagram of an hanged person will gradually appear, based on the number of your wrong guesses.
-In the sixth mistake, you will lose the game and the poor man will be hanged!
-Let's Begin!
-Here is your secret word: """)
-new_list = create_word_list()
-chosen_word = choose_word(new_list)
-print(create_underscore(chosen_word))
 game_loop(chosen_word)

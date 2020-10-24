@@ -24,9 +24,6 @@ def create_word_list():
     content_list = [item.removesuffix("\n") for item in content]
     return content_list
 
-new_list = create_word_list()
-
-
 def choose_word():
     """
     This function chooses a random word from the list.
@@ -37,8 +34,6 @@ def choose_word():
     """
     random_word = random.choice(new_list)
     return random_word
-
-chosen_word = choose_word()
 
 def create_underscore(word):
     """
@@ -52,8 +47,6 @@ def create_underscore(word):
     for _ in word:
         beginning_string = beginning_string + "_ "
     return beginning_string
-
-print(create_underscore(chosen_word))
 
 def reveal_progress(word, list1):
     """
@@ -132,16 +125,6 @@ def check_letter_in_word(word, character):
     """
     check_in = character in word
     return check_in
-
-def present_message(true_guess):
-    """
-    :param true_guess: is the guess correct?
-    :type true_guess: bool
-    """
-    if true_guess:
-        print("Correct guess!")
-    else:
-        print("Wrong guess! A poor man will be soon hanged!")
 
 def create_mistakes_list(true_guess, character3, user_mistakes_list):
     """
@@ -281,7 +264,10 @@ def game_loop(word):
         print(progress)
         present_guesses(previous_guesses_list, lower_cased_guessed)
         is_correct = check_letter_in_word(word, lower_cased_guessed)
-        present_message(is_correct)
+        if is_correct:
+            print("Correct guess!")
+        else:
+            print("Wrong guess! A poor man will be soon hanged!")
         your_mistakes_list = create_mistakes_list(is_correct, lower_cased_guessed, mistakes_list)
         mistakes_num = counting_mistakes(your_mistakes_list)
         print(diagram(mistakes_num))
@@ -294,4 +280,7 @@ def game_loop(word):
         if winning:
             break
 
+chosen_word = choose_word()
+print(create_underscore(chosen_word))
+new_list = create_word_list()
 game_loop(chosen_word)

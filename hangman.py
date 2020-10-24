@@ -56,20 +56,20 @@ def create_underscore(chosen_word):
 print(create_underscore(chosen_word))
 
 
-def reveal_progress(word2, list1):
+def reveal_progress(chosen_word, list1):
     """
     This function reveals the progress of the game.
     This function returns a string of letters and underscores.
     The letters are the right guesses, in their position in the secret word.
     A letter which the user has not guessed yet, is replaced with an underscore.
     :param list1: a list of the previous guesses of the user.
-    :param word2: the word the user needs to guess
-    type word2: str
+    :param chosen_word: the word the user needs to guess
+    type chosen_word: str
     :return: user_interface
     :rtype: str
     """
     user_interface = ""
-    for letter in word2:
+    for letter in chosen_word:
         if letter in list1:
             user_interface = user_interface + letter
         else:
@@ -180,16 +180,16 @@ def alpha_validation(user_input):
     return user_input.isalpha()
 
 
-def check_letter_in_word(word3, character2):
+def check_letter_in_word(chosen_word, character2):
     """
-    :param word3: the secret word
-    :type word3: str
+    :param chosen_word: the secret word
+    :type chosen_word: str
     :param character2: the character which the user entered
     :type character2: str
     :return: is the character in the word?
     :rtype: bool
     """
-    check_in = character2 in word3
+    check_in = character2 in chosen_word
     return check_in
 
 
@@ -294,25 +294,24 @@ def find_winning_number(letter_in_word, winning_number):
     return winning_number
 
 
-def check_winning(word4, winning_num):
+def check_winning(chosen_word, winning_num):
     """
-    :param word4: the secret word
-    :type word4: str
+    :param chosen_word: the secret word
+    :type chosen_word: str
     :param winning_num: the correct guesses of the user
     :type winning_num: int
     :return: has the user guessed all the letters?
     :rtype: bool
     """
-    you_won = len(word4) == winning_num
+    you_won = len(chosen_word) == winning_num
     if you_won:
         print("Congratulations, you won!")
     return you_won
 
 
-def game_loop(secret_word):
+def game_loop(chosen_word):
     """a loop creates multiple turns for the same game.
-    First, a secret word is chosen and presented on the screen.
-    Afterwards, in each turn, the user suggests a letter.
+    In each turn, the user suggests a letter.
     The input is checked to make sure it is valid.
     Then, the user's progress and previous letters are presented.
     The loop breaks when the user wins or loses."""
@@ -328,20 +327,20 @@ def game_loop(secret_word):
         valid3 = alpha_validation(lower_cased_guessed)
         if not valid1 or not valid2 or not valid3:
             continue
-        progress = reveal_progress(secret_word, previous_guesses_list)
+        progress = reveal_progress(chosen_word, previous_guesses_list)
         print(progress)
         present_guesses(previous_guesses_list, lower_cased_guessed)
-        is_correct = check_letter_in_word(secret_word, lower_cased_guessed)
+        is_correct = check_letter_in_word(chosen_word, lower_cased_guessed)
         present_message(is_correct)
         your_mistakes_list = create_mistakes_list(is_correct, lower_cased_guessed, mistakes_list)
         mistakes_num = counting_mistakes(your_mistakes_list)
         print(diagram(mistakes_num))
         if mistakes_num == 6:
             print("Game over! You lost!")
-            print("Your secret word was:", secret_word)
+            print("Your secret word was:", chosen_word)
             break
         find_winning_number(is_correct, correct_guesses_num)
-        winning = check_winning(secret_word, correct_guesses_num)
+        winning = check_winning(chosen_word, correct_guesses_num)
         if winning:
             break
 

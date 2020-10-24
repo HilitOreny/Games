@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\yello\\AppData\\Local\\Programs\\Python\\Python39\\python.exe"
+    "python.pythonPath": "C:\\Users\\yello\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+    "python.linting.pylintUseMinimalCheckers": false
 }

@@ -121,7 +121,7 @@ class Repeat(Exception):
 class NoAlpha(Exception):
     """This class is later used for user's input validation"""
 
-def check_letter_in_word(word, character2):
+def check_letter_in_word(word, character):
     """
     :param word: the secret word
     :type word: str
@@ -130,7 +130,7 @@ def check_letter_in_word(word, character2):
     :return: is the character in the word?
     :rtype: bool
     """
-    check_in = character2 in word
+    check_in = character in word
     return check_in
 
 def present_message(true_guess):
@@ -217,28 +217,28 @@ def diagram(number):
     current_diagram = hangman_diagram[number]
     return current_diagram
 
-def find_winning_number(letter_in_word, winning_number):
+def correct_number(letter_in_word, num):
     """
     :param letter_in_word: is the letter in the secret word?
     :type letter_in_word: bool
-    :param winning_number: the number of correct guesses
+    :param num: the number of correct guesses
     :return: a number of the correct guesses of the user
     :rtype: int
     """
     if letter_in_word:
-        winning_number = winning_number + 1
-    return winning_number
+        num = num + 1
+    return num
 
-def check_winning(word, winning_num):
+def check_winning(word, num):
     """
     :param word: the secret word
     :type word: str
-    :param winning_num: the correct guesses of the user
-    :type winning_num: int
+    :param num: the correct guesses of the user
+    :type num: int
     :return: has the user guessed all the letters?
     :rtype: bool
     """
-    you_won = len(word) == winning_num
+    you_won = len(word) == num
     if you_won:
         print("Congratulations, you won!")
     return you_won
@@ -267,16 +267,14 @@ def game_loop(word):
             if same_letter:
                 raise Repeat
         except Repeat:
-            print("""You have already guessed this letter...
-            Please suggest a different letter.""")
+            print("You have already guessed this letter... Please suggest a different letter.")
             continue
         letter_only = lower_cased_guessed.isalpha()
         try:
             if not letter_only:
                 raise NoAlpha
         except NoAlpha:
-            print("""Please suggest a letter.
-              No numbers or symbols, please...""")
+            print("Please suggest a letter. No numbers or symbols, please...")
             continue
         previous_guesses_list.append(lower_cased_guessed)
         progress = reveal_progress(word, previous_guesses_list)
@@ -291,7 +289,7 @@ def game_loop(word):
             print("Game over! You lost!")
             print("Your secret word was:", word)
             break
-        find_winning_number(is_correct, correct_guesses_num)
+        correct_guesses_num = correct_number(is_correct, correct_guesses_num)
         winning = check_winning(word, correct_guesses_num)
         if winning:
             break

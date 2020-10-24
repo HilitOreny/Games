@@ -68,9 +68,9 @@ def reveal_progress(word, list1):
     :rtype: str
     """
     user_interface = ""
-    for letter in word:
-        if letter in list1:
-            user_interface = user_interface + letter
+    for _ in word:
+        if _ in list1:
+            user_interface = user_interface + _
         else:
             user_interface = user_interface + "_ "
     return user_interface
@@ -82,7 +82,7 @@ def format_guesses(list2):
     :return: sequence of letters
     :rtype: str
     """
-    converted = ', '.join(map(str, list2[0:-1]))
+    converted = ', '.join(list2[0:-1])
     final = converted + " and " + str(list2[-1])
     return final
 
@@ -100,7 +100,7 @@ def present_guesses(user_guesses_list, one_letter):
         current_list = format_guesses(user_guesses_list)
         print(current_list)
         print("Here is a list of the letters you have guessed by alphabetical order: ")
-        alphabetical_order = sorted(current_list)
+        alphabetical_order = sorted(user_guesses_list)
         alphabetical_list = format_guesses(alphabetical_order)
         print(alphabetical_list)
     elif len(user_guesses_list) == 2:
@@ -269,6 +269,7 @@ def game_loop(word):
         except Repeat:
             print("""You have already guessed this letter...
             Please suggest a different letter.""")
+            continue
         letter_only = lower_cased_guessed.isalpha()
         try:
             if not letter_only:
@@ -276,6 +277,8 @@ def game_loop(word):
         except NoAlpha:
             print("""Please suggest a letter.
               No numbers or symbols, please...""")
+            continue
+        previous_guesses_list.append(lower_cased_guessed)
         progress = reveal_progress(word, previous_guesses_list)
         print(progress)
         present_guesses(previous_guesses_list, lower_cased_guessed)

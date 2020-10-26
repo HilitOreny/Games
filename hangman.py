@@ -1,18 +1,6 @@
 """using random module, a secret word will be randomly chosen"""
 import random
 
-print("""Welcome to hangman!
-In this game, your goal is to guess the secret word before an innocent man is hanged.
-The secret word will be shown as a sequence of underscores (_). Each underscore represents a letter.
-For example, _ _ _ is a three-letter word.
-Each turn, you will suggest a letter.
-If the letter occurs in the secret word, the letter will appear in the word in its position.
-If the suggested letter does not occur in the word, your mistake is fatal!
-A diagram of an hanged person will gradually appear, based on the number of your wrong guesses.
-In the sixth mistake, you will lose the game and the poor man will be hanged!
-Let's Begin!
-Here is your secret word: """)
-
 def create_word_list():
     """
     This function opens a file called "words.txt".
@@ -24,7 +12,7 @@ def create_word_list():
     content_list = [item.removesuffix("\n") for item in content]
     return content_list
 
-def choose_word():
+def choose_word(word_list):
     """
     This function chooses a random word from the list.
     This word will be later used by other functions as the secret word for the game.
@@ -32,7 +20,7 @@ def choose_word():
     :return: random_word
     :rtype: str
     """
-    random_word = random.choice(new_list)
+    random_word = random.choice(word_list)
     return random_word
 
 def create_underscore(word):
@@ -125,6 +113,18 @@ def check_letter_in_word(word, character):
     """
     check_in = character in word
     return check_in
+
+def print_message(bool_value):
+    """
+    :param bool_value: is the character in the word?
+    :type bool_value: bool
+    :return: a message for the player
+    :rtype: str
+    """
+    if bool_value:
+        return "Correct guess!"
+    else:
+        return "Wrong guess! A poor man will be soon hanged!"
 
 def create_mistakes_list(true_guess, character3, user_mistakes_list):
     """
@@ -226,61 +226,68 @@ def check_winning(word, num):
         print("Congratulations, you won!")
     return you_won
 
-def game_loop(word):
-    """a loop creates multiple turns for the same game.
-    In each turn, the user suggests a letter.
-    The input is checked to make sure it is valid.
-    Then, the user's progress and previous letters are presented.
-    The loop breaks when the user wins or loses."""
-    previous_guesses_list = []
-    mistakes_list = []
-    correct_guesses_num = 0
-    mistakes_num = 0
-    while mistakes_num < 6:
-        letter_guessed: str = input("Please suggest a letter: ")
-        lower_cased_guessed = letter_guessed.lower()
-        try:
-            if len(lower_cased_guessed) != 1:
-                raise MultipleCharacters
-        except MultipleCharacters:
-            print("Please suggest just one letter...")
-            continue
-        same_letter = lower_cased_guessed in previous_guesses_list
-        try:
-            if same_letter:
-                raise Repeat
-        except Repeat:
-            print("You have already guessed this letter... Please suggest a different letter.")
-            continue
-        letter_only = lower_cased_guessed.isalpha()
-        try:
-            if not letter_only:
-                raise NoAlpha
-        except NoAlpha:
-            print("Please suggest a letter. No numbers or symbols, please...")
-            continue
-        previous_guesses_list.append(lower_cased_guessed)
-        progress = reveal_progress(word, previous_guesses_list)
-        print(progress)
-        present_guesses(previous_guesses_list, lower_cased_guessed)
-        is_correct = check_letter_in_word(word, lower_cased_guessed)
-        if is_correct:
-            print("Correct guess!")
-        else:
-            print("Wrong guess! A poor man will be soon hanged!")
-        your_mistakes_list = create_mistakes_list(is_correct, lower_cased_guessed, mistakes_list)
-        mistakes_num = counting_mistakes(your_mistakes_list)
-        print(diagram(mistakes_num))
-        if mistakes_num == 6:
-            print("Game over! You lost!")
-            print("Your secret word was:", word)
-            break
-        correct_guesses_num = correct_number(is_correct, correct_guesses_num)
-        winning = check_winning(word, correct_guesses_num)
-        if winning:
-            break
+def game_reset():
+    """
+    this function resets values which will be later used
+    """
+    reset_values = {"previous_guesses_list": [],
+    "mistakes_list": [],
+    "correct_guesses_num": 0,
+    "mistakes_num": 0}
+    return reset_values
 
-chosen_word = choose_word()
-print(create_underscore(chosen_word))
+print("""Welcome to hangman!
+In this game, your goal is to guess the secret word before an innocent man is hanged.
+The secret word will be shown as a sequence of underscores (_). Each underscore represents a letter.
+For example, _ _ _ is a three-letter word.
+Each turn, you will suggest a letter.
+If the letter occurs in the secret word, the letter will appear in the word in its position.
+If the suggested letter does not occur in the word, your mistake is fatal!
+A diagram of an hanged person will gradually appear, based on the number of your wrong guesses.
+In the sixth mistake, you will lose the game and the poor man will be hanged!
+Let's Begin!
+Here is your secret word: """)
 new_list = create_word_list()
-game_loop(chosen_word)
+chosen_word = choose_word(new_list)
+print(create_underscore(chosen_word))
+reset = game_reset()
+while reset["mistakes_num"] < 6:
+    letter_guessed: str = input("Please suggest a letter: ")
+    guess = letter_guessed.lower()
+    try:
+        if len(guess) != 1:
+            raise MultipleCharacters
+    except MultipleCharacters:
+        print("Please suggest just one letter...")
+        continue
+    same_letter = guess in reset["previous_guesses_list"]
+    try:
+        if same_letter:
+            raise Repeat
+    except Repeat:
+        print("You have already guessed this letter... Please suggest a different letter.")
+        continue
+    letter_only = guess.isalpha()
+    try:
+        if not letter_only:
+            raise NoAlpha
+    except NoAlpha:
+        print("Please suggest a letter. No numbers or symbols, please...")
+        continue
+    reset["previous_guesses_list"].append(guess)
+    progress = reveal_progress(chosen_word, reset["previous_guesses_list"])
+    print(progress)
+    present_guesses(reset["previous_guesses_list"], guess)
+    is_correct = check_letter_in_word(chosen_word, guess)
+    print (print_message(is_correct))
+    your_mistakes_list = create_mistakes_list(is_correct, guess, reset["mistakes_list"])
+    reset["mistakes_num"] = counting_mistakes(your_mistakes_list)
+    print(diagram(reset["mistakes_num"]))
+    if reset["mistakes_num"] == 6:
+        print("Game over! You lost!")
+        print("Your secret word was:", chosen_word)
+        break
+    reset["correct_guesses_num"] = correct_number(is_correct, reset["correct_guesses_num"])
+    winning = check_winning(chosen_word, reset["correct_guesses_num"])
+    if winning:
+        break
